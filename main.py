@@ -49,6 +49,7 @@ HTML_TEMPLATE = """
         <p><strong>Stress:</strong> {{ result.stress }} MPa</p>
         <p><strong>Strain:</strong> {{ result.strain }}</p>
         <p><strong>Deformation:</strong> {{ result.deformation }} mm</p>
+        <p><strong>Factor of Safety:</strong> {{ result.fos }}</p>
         {% if result.yielded %}
             <p class="warning">⚠️ WARNING: Stress exceeds Yield Strength!</p>
         {% else %}
@@ -75,11 +76,13 @@ def home():
             strain = stress / modulus
             deformation = strain * length
             yielded = stress > yield_strength
+            fos = yield_strength / stress if stress > 0 else float('inf')
 
             result = {
                 'stress': round(stress, 4),
                 'strain': round(strain, 6),
                 'deformation': round(deformation, 4),
+                'fos': round(fos, 2) if fos != float('inf') else 'N/A',
                 'yielded': yielded
             }
         except (ValueError, ZeroDivisionError):
